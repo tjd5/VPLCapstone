@@ -1,0 +1,112 @@
+canvas {
+  width: auto;
+  height: auto;
+}
+
+svg {
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+input[type="number"] {
+  width: 50px;
+  text-align: center;
+}
+
+form {
+  background-color: #f1f1f1;
+  width: fit-content;
+  border: 1px solid #dcdbdb;
+  padding: 4%;
+  box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+}
+table {
+  width: fit-content;
+  padding: 4%;
+  box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+}
+
+input[type="color"] {
+  vertical-align: middle;
+}
+
+.time {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.button {
+  padding: 2px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  background-color: white;
+  transition: 0.2s;
+}
+
+.start-button {
+  border: 1px solid green;
+  color: green;
+}
+
+.button:disabled,
+.button[disabled] {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.button:disabled:hover,
+.button[disabled]:hover {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.add-button {
+  border: 1px solid black;
+  color: black;
+}
+
+.clear-button {
+  border: 1px solid red;
+  color: red;
+}
+
+.button:hover {
+  box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 1px 10px 20px -10px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.start-button:hover {
+  background-color: green;
+  
+}
+
+.add-button:hover {
+  background-color: black;
+}
+
+.clear-button:hover {
+  background-color: red;
+}
+
+

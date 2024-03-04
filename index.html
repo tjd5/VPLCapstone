@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <title>Maze Perception</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <a href="/index.html" class="navbar-brand mb-0 h1">
+          <img
+            class="d-inline-block align-top"
+            src="https://futuretechnologies.njit.edu/sites/futuretechnologies/files/njit%20logo_0.png"
+            width="150"
+            height="100"
+          />
+        </a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col maze-customiaztion-form mt-3">
+          <div class="header mb-2">Customize Maze</div>
+          <form class="maze-customiaztion-form" onsubmit="addMaze()">
+            <div class="section-title">Maze type:</div>
+            <input
+              type="radio"
+              value="maze"
+              id="maze-input"
+              name="maze-design"
+              checked
+            />
+            <label for="maze-input">Maze</label>
+            <input
+              type="radio"
+              name="maze-design"
+              id="labyrinth-input"
+              value="labyrinth"
+            />
+            <label for="labyrinth-input">Labyrinth</label>
+            <div class="section-title mt-2">Size:</div>
+            <label for="width" class="mt-1">
+              Width:
+              <input type="number" min="1" value="10" id="width" />
+            </label>
+            <br />
+            <label for="height" class="mt-1">
+              Height:
+              <input type="number" min="1" value="10" id="height" />
+            </label>
+            <div class="section-title mt-2">Background squares:</div>
+            <label for="rect-num" class="mt-1">
+              Number:
+              <input type="number" value="0" min="0" max="10" id="rect-num" />
+            </label>
+            <br />
+            <label for="fill-rect-color" class="mt-1">
+              Fill color:
+              <input type="color" id="fill-rect-color" value="#ffffff" />
+            </label>
+            <br />
+            <label for="border-rect-color" class="mt-1">
+              Border color:
+              <input type="color" id="border-rect-color" value="#ffffff" />
+            </label>
+            <div class="section-title mt-2">Path:</div>
+            <label for="path-color" class="mt-1">
+              Color:
+              <input type="color" id="path-color" value="#ffffff" />
+            </label>
+            <br />
+            <label for="path-size" class="mt-1">
+              Size:
+              <input type="number" value="20" min="1" id="path-size" />
+            </label>
+            <div class="section-title mt-2">Wall:</div>
+            <label for="wall-color" class="mt-1">
+              Color:
+              <input type="color" id="wall-color" value="#000000" />
+            </label>
+            <br />
+            <label for="wall-size" class="mt-1">
+              Size:
+              <input type="number" value="1" min="1" max="5" id="wall-size" />
+            </label>
+            <br />
+            <label for="shadow-color" class="mt-1">
+              Shadow color:
+              <input type="color" id="shadow-color" />
+            </label>
+            <br />
+            <label for="shadow-blur" class="mt-1">
+              Shadow blur:
+              <input
+                type="range"
+                min="0"
+                max="5"
+                id="shadow-blur"
+                value="0"
+                class="slider"
+                step=".5"
+              />
+            </label>
+            <div class="section-title mt-2">User icon:</div>
+            <label for="user-icon-color" class="mt-1">
+              Color:
+              <input type="color" id="user-icon-color" value="#d49d04" />
+            </label>
+            <div class="section-title mt-2">Goal:</div>
+            <label for="goal-color" class="mt-1">
+              Color:
+              <input type="color" id="goal-color" value="#04d427" />
+            </label>
+            <div class="section-title mt-2">Effects:</div>
+            <input type="checkbox" name="maze-effects" id="wavy" value="true" />
+            <label for="wavy" class="mt-1">Wavy</label>
+            <br />
+            <label for="blur-value" class="mt-1">
+              Blur:
+              <input
+                type="range"
+                min="0"
+                max="3"
+                id="blur-value"
+                value="0"
+                class="slider"
+                step=".1"
+              />
+            </label>
+            <br />
+            
+
+
+            <input type="file" id="image-input" style="display: none;">
+    <button class="upload-button" onclick="document.getElementById('image-input').click()">Upload Image</button>
+    <div id="image-preview"></div>
+
+
+
+
+
+
+
+            <input
+              id="add-maze"
+              type="submit"
+              value="Add Maze"
+              class="button add-button mt-3"
+            />
+          </form>
+          <button
+            id="start-btn"
+            class="mt-3 button start-button"
+            disabled="true"
+            onclick="startGame()"
+          >
+            Begin Trial
+          </button>
+          <button
+            id="download-btn"
+            class="mt-3 button start-button"
+            hidden="true"
+            onclick="downloadMaze()"
+          >
+            Download
+          </button>
+        </div>
+        <div class="col mt-3">
+          <div class="header">Trial Mazes</div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Width</th>
+                <th scope="col">Height</th>
+                <th scope="col">Path Size</th>
+                <th scope="col">Path Color</th>
+                <th scope="col">Wall Color</th>
+              </tr>
+            </thead>
+            <tbody class="maze-table"></tbody>
+          </table>
+          <button
+            id="clear-mazes"
+            class="button clear-button"
+            onClick="clearTrial()"
+          >
+            Clear Trial
+          </button>
+        </div>
+      </div>
+      <div id="time" class="container mt-5 time mx-auto text-center"></div>
+      <div class="container my-5 d-flex justify-content-center">
+        <canvas id="maze-canvas" class="mx-auto"></canvas>
+      </div>
+      <svg width="100%" height="100%" style="display: none">
+        <defs>
+          <filter id="wavy-filter" filterUnits="userSpaceOnUse" x="0" y="0">
+            <feTurbulence
+              id="wave-animation"
+              numOctaves="1"
+              seed="1"
+              baseFrequency="0 0.0645034"
+            ></feTurbulence>
+            <feDisplacementMap scale="5" in="SourceGraphic"></feDisplacementMap>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="src/cell.js"></script>
+    <script type="module" src="src/utils.js"></script>
+    <script type="module" src="src/grid.js"></script>
+    <script type="module" src="src/maze.js"></script>
+    <script type="module">
+      import Maze from "./src/maze.js";
+      import {
+        downloadObjectAsJson,
+        msToTime,
+        rgbToHex,
+        hexToRgb,
+      } from "./src/utils.js";
+
+      const mazes = [];
+      let maze = null;
+      const completedTrials = [];
+      let mazeVals = null;
+      let mouseIsDown = false;
+      let lastX = 0;
+      let lastY = 0;
+      let userIcon = null;
+      let startTime = null;
+      let endTime = null;
+      let pixelsTraveled = 0;
+      const canvas = document.getElementById("maze-canvas");
+      let offsetX = canvas.getBoundingClientRect().left;
+      let offsetY = canvas.getBoundingClientRect().top;
+      let context = canvas.getContext("2d", { willReadFrequently: true });
+
+      const handleFileSelect = (event) => {
+            const selectedFile = event.target.files[0];
+            
+
+            // Create a file reader
+            const reader = new FileReader();
+
+            // Handle the file loading
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Draw the image on the canvas as the background
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = e.target.result;
+            };
+
+            // Read the file as a data URL
+            reader.readAsDataURL(selectedFile);
+        };
+
+        // Attach an event listener to the file input element
+        const fileInput = document.getElementById('image-input');
+        fileInput.addEventListener('change', handleFileSelect);
+
+      window.onload = function () {
+        canvas.addEventListener("mousedown", handleDown);
+
+        canvas.addEventListener("mouseup", handleUp);
+
+        canvas.addEventListener("mousemove", handleMouseMove);
+
+        canvas.addEventListener("touchstart", handleDown);
+
+        canvas.addEventListener("touchend", handleUp);
+
+        canvas.addEventListener("touchmove", handleMouseMove);
+
+        canvas.addEventListener("mouseleave", () => {
+          mouseIsDown = false;
+        });
+      };
+
+      /**
+       * Checks that there are no conflicting maze colors.
+       */
+      function validateMazeColors(
+        pathColor,
+        wallColor,
+        backgroundRectBorderColor,
+        backgroundRectFillColor,
+        userIconColor,
+        goalColor
+      ) {
+        const colorCombinations = {
+          [pathColor === wallColor]:
+            "Path color and wall color cannot be the same.",
+          [wallColor === backgroundRectBorderColor]:
+            "Wall color and background rectangle border color cannot be the same.",
+          [wallColor === backgroundRectFillColor]:
+            "Wall color and background rectangle fill color cannot be the same.",
+          [goalColor === backgroundRectFillColor]:
+            "Goal color and background rectangle fill color cannot be the same.",
+          [goalColor === backgroundRectBorderColor]:
+            "Goal color and background rectangle border color cannot be the same.",
+          [userIconColor === goalColor]:
+            "Goal color and user icon color cannot be the same.",
+          [wallColor === userIconColor]:
+            "Wall color and user icon color cannot be the same.",
+          [goalColor === wallColor]:
+            "Goal color and wall color cannot be the same.",
+          [pathColor === goalColor]:
+            "Path color and goal color cannot be the same.",
+        };
+
+        for (const condition in colorCombinations) {
+          if (condition === true) {
+            alert(colorCombinations[condition]);
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      function clearTrial() {
+        mazes.length = 0;
+        document.querySelector("#start-btn").disabled = true;
+        document.querySelector(".maze-table").replaceChildren();
+      }
+
+      function addMaze() {
+        event.preventDefault();
+
+        const mazeDesignValue = document.querySelector(
+          'input[name="maze-design"]:checked'
+        ).value;
+        const blurValue = parseInt(document.querySelector("#blur-value").value);
+        const pathColorValue = document.querySelector("#path-color").value;
+        const wallColorValue = document.querySelector("#wall-color").value;
+        const backgroundRectBorderValue =
+          document.querySelector("#border-rect-color").value;
+        const backgroundRectFillValue =
+          document.querySelector("#fill-rect-color").value;
+        const backgroundRectNumValue = parseInt(
+          document.querySelector("#rect-num").value
+        );
+        const userIconColorValue =
+          document.querySelector("#user-icon-color").value;
+        const goalColorValue = document.querySelector("#goal-color").value;
+        const widthValue = parseInt(document.querySelector("#width").value);
+        const heightValue = parseInt(document.querySelector("#height").value);
+        const shadowColorValue = document.querySelector("#shadow-color").value;
+        const effectsValue = document.querySelector("#wavy").checked;
+        const shadowBlurValue = parseInt(
+          document.querySelector("#shadow-blur").value
+        );
+        const pathSizeValue = parseInt(
+          document.querySelector("#path-size").value
+        );
+        const wallSizeValue = parseInt(
+          document.querySelector("#wall-size").value
+        );
+
+        if (
+          !validateMazeColors(
+            pathColorValue,
+            wallColorValue,
+            backgroundRectBorderValue,
+            backgroundRectFillValue,
+            userIconColorValue,
+            goalColorValue
+          )
+        ) {
+          return;
+        }
+
+        mazes.push({
+          design: mazeDesignValue,
+          pathColor: pathColorValue,
+          wallColor: wallColorValue,
+          width: widthValue,
+          height: heightValue,
+          pathSize: pathSizeValue,
+          blur: blurValue,
+          wallSize: wallSizeValue,
+          shadowBlur: shadowBlurValue,
+          shadowColor: shadowColorValue,
+          userIconColor: userIconColorValue,
+          goalColor: goalColorValue,
+          backgroundRects: {
+            num: backgroundRectNumValue,
+            border: backgroundRectBorderValue,
+            fill: backgroundRectFillValue,
+          },
+          effects: effectsValue,
+        });
+
+        document.querySelector("#start-btn").disabled = false;
+        const table = document.querySelector(".maze-table");
+        const tr = document.createElement("tr");
+        const values = [
+          widthValue,
+          heightValue,
+          pathSizeValue,
+          pathColorValue,
+          wallColorValue,
+        ];
+        for (const value of values) {
+          const td = document.createElement("td");
+          td.textContent = value;
+          tr.appendChild(td);
+        }
+
+        table.appendChild(tr);
+      }
+
+      function startGame() {
+        const timerElem = document.getElementById("time");
+        completedTrials.length = 0;
+        timerElem.innerHTML = "";
+        mazeVals = mazes.shift();
+        resetUserIcon();
+        document.querySelector("#add-maze").disabled = true;
+        document.querySelector(".maze-table").replaceChildren();
+        document.querySelector("#start-btn").disabled = true;
+        maze = new Maze(
+          mazeVals.height,
+          mazeVals.width,
+          mazeVals.wallColor,
+          mazeVals.pathColor,
+          mazeVals.wallSize,
+          mazeVals.pathSize,
+          mazeVals.design,
+          mazeVals.shadowColor,
+          mazeVals.shadowBlur,
+          mazeVals.goalColor,
+          mazeVals.backgroundRects,
+          mazeVals.effects
+        );
+        canvas.style.filter = `blur(${mazeVals.blur}px)`;
+        maze.draw();
+        document.querySelector("#download-btn").hidden = false;
+        drawFrame();
+        document.getElementById("maze-canvas").scrollIntoView();
+        startTime = new Date();
+      }
+
+      function nextMaze() {
+        mouseIsDown = false;
+        endTime = new Date();
+        completedTrials.push({
+          maze: {
+            values: mazeVals,
+            solveTime: msToTime(endTime - startTime),
+            pixelsTraveled: pixelsTraveled,
+          },
+        });
+        pixelsTraveled = 0;
+        if (mazes.length === 0) {
+          const timerElem = document.getElementById("time");
+          timerElem.innerHTML = `Time: ${msToTime(endTime - startTime)}`;
+          canvas.width = 0;
+          canvas.height = 0;
+          document.querySelector("#download-btn").hidden = true;
+          document.querySelector("#add-maze").disabled = false;
+          downloadObjectAsJson(
+            completedTrials,
+            `trial-results-${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}-${startTime.getHours()}-${startTime.getMinutes()}-${startTime.getSeconds()}`
+          );
+          return;
+        }
+        mazeVals = mazes.shift();
+        resetUserIcon();
+        maze = new Maze(
+          mazeVals.height,
+          mazeVals.width,
+          mazeVals.wallColor,
+          mazeVals.pathColor,
+          mazeVals.wallSize,
+          mazeVals.pathSize,
+          mazeVals.design,
+          mazeVals.shadowColor,
+          mazeVals.shadowBlur,
+          mazeVals.goalColor,
+          mazeVals.backgroundRects,
+          mazeVals.effects
+        );
+        canvas.style.filter = `blur(${mazeVals.blur}px)`;
+        maze.draw();
+        drawFrame();
+        document.getElementById("maze-canvas").scrollIntoView();
+      }
+
+      function handleMouseMove(event) {
+        event.preventDefault();
+        if (!mouseIsDown) {
+          return;
+        }
+
+        let clientX = event.clientX
+          ? event.clientX
+          : event.targetTouches[0].clientX;
+        let clientY = event.clientY
+          ? event.clientY
+          : event.targetTouches[0].clientY;
+        let mouseX = parseInt(clientX - offsetX);
+        let mouseY = parseInt(clientY - offsetY);
+        let diffX = mouseX - lastX;
+        let diffY = mouseY - lastY;
+        let destX = userIcon.x + diffX;
+        let destY = userIcon.y + diffY;
+
+        if (
+          Math.abs(diffX) < userIcon.width &&
+          Math.abs(diffY) < userIcon.height
+        ) {
+          let canMove = canMoveTo(destX, destY);
+          if (canMove === 1) {
+            pixelsTraveled += diffX + diffY;
+            userIcon.x += diffX;
+            userIcon.y += diffY;
+          } else if (canMove == 2) {
+            nextMaze();
+          }
+        }
+        lastX = mouseX;
+        lastY = mouseY;
+        drawFrame();
+      }
+
+      function handleUp(event) {
+        event.preventDefault();
+        mouseIsDown = false;
+      }
+
+      function handleDown(event) {
+        event.preventDefault();
+        let clientX = event.clientX
+          ? event.clientX
+          : event.targetTouches[0].clientX;
+        let clientY = event.clientY
+          ? event.clientY
+          : event.targetTouches[0].clientY;
+        let mouseX = parseInt(clientX - offsetX);
+        let mouseY = parseInt(clientY - offsetY);
+
+        lastX = mouseX;
+        lastY = mouseY;
+        mouseIsDown = true;
+      }
+
+      function drawFrame() {
+        context.beginPath();
+        context.drawImage(canvas.offscreenCanvas, 0, 0);
+        drawUserIcon();
+      }
+
+      function downloadMaze() {
+        canvas.offscreenCanvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a"); // Or maybe get it from the current document
+          link.href = url;
+          link.download = `${mazeVals.width}x${mazeVals.height}-${mazeVals.pathColor}-path-${mazeVals.wallColor}-wall-${mazeVals.design}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+        });
+        canvas.offscreenCanvas2.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a"); // Or maybe get it from the current document
+          link.href = url;
+          link.download = `${mazeVals.width}x${mazeVals.height}-${mazeVals.pathColor}-path-${mazeVals.wallColor}-wall-${mazeVals.design}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+        });
+      }
+
+      function drawUserIcon() {
+        context.beginPath();
+        context.shadowColor = "transparent";
+        context.fillStyle = userIcon.color;
+        context.fillRect(
+          userIcon.x,
+          userIcon.y,
+          userIcon.width,
+          userIcon.height
+        );
+      }
+
+      /**
+       * Checks if the user icon can move to the given coordinates
+       * @param {number} destX The x coordinate to move to
+       * @param {number} destY The y coordinate to move to
+       * @returns {number} 0 if the user icon cannot move to the given coordinates, 1 if it can, and 2 if it has reached the goal
+       */
+      function canMoveTo(destX, destY) {
+        let imgData = context.getImageData(
+          destX,
+          destY,
+          userIcon.width + 1,
+          userIcon.height + 1
+        ).data;
+        let canMove = 1;
+        let rgb = null;
+
+        if (
+          destX >= 0 &&
+          destX <= mazeVals.width * mazeVals.pathSize - userIcon.width +10 &&
+          destY >= 0 &&
+          destY <= mazeVals.height * mazeVals.pathSize - userIcon.height +10
+        ) {
+          // check if in bounds
+          for (let i = 0; i < imgData.length; i += 4) {
+            rgb = rgbToHex(imgData[i], imgData[i + 1], imgData[i + 2]);
+            if (rgb === mazeVals.wallColor) {
+              canMove = 0;
+              break;
+            } else if (rgb === mazeVals.goalColor) {
+              canMove = 2;
+              break;
+            }
+          }
+        } else {
+          canMove = 0;
+        }
+        return canMove;
+      }
+
+      function resetUserIcon() {
+        userIcon = {
+          width: mazeVals.pathSize * 0.5,
+          height: mazeVals.pathSize * 0.5,
+          x: mazeVals.pathSize * 0.125,
+          y: mazeVals.pathSize * 0.125,
+          color: mazeVals.userIconColor,
+        };
+      }
+
+      window.addMaze = addMaze;
+      window.startGame = startGame;
+      window.clearTrial = clearTrial;
+      window.downloadMaze = downloadMaze;
+    </script>
+  </body>
+</html>

@@ -1,1 +1,1 @@
-# VPLCapstone
+# maze-perception
