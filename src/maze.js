@@ -1,6 +1,6 @@
 import Grid from "./grid.js";
 import { Dirs } from "./utils.js";
-
+import { shuffle } from "./utils.js";
 /**
  * Maze class that contains all the information about the maze
  */
@@ -32,16 +32,21 @@ export default class Maze {
     };
 
     if (this.type === "labyrinth") {
+      this.maze = Maze.generateMaze(new Grid(this.height, this.width));
       this.height = Math.floor(this.height / 2);
       this.width = Math.floor(this.width / 2);
       this.pathSize *= 2;
+      this.maze.getCell(0, 0).up = false; 
     }
-    this.maze = Maze.generateMaze(new Grid(this.height, this.width));
-    if (this.type === "maze") {
+    else if (this.type === "maze") { 
+      this.maze = Maze.generateMaze(new Grid(this.height, this.width));
+      this.maze.getCell(0, 0).left = false; // creates entrance
+      this.maze.getCell(this.maze.height - 1, this.maze.width - 1).right = false; // creates exit 
+    }
+    else if (this.type === "maze2") { 
+      this.maze = Maze.generateMazeRecursiveBacktracker(new Grid(this.height, this.width)); 
       this.maze.getCell(0, 0).left = false; // creates entrance
       this.maze.getCell(this.maze.height - 1, this.maze.width - 1).right = false; // creates exit
-    } else {
-      this.maze.getCell(0, 0).up = false;
     }
     for (let i = 0; i < backgroundRects.num; i++) {
       this.backgroundRects.rectInfo.push({
@@ -219,11 +224,41 @@ export default class Maze {
   }
 
   /**
+   * Generates a maze using Recursive Backtracker algorithm
+   * @param {Grid} grid
+   * @returns {Grid} a grid with a generated maze
+   */
+  static generateMazeRecursiveBacktracker(grid) {
+    //randomly select starting cell. column/row
+    let currRow, currCol, startRow, startCol, visited, potDirs;
+    potDirs = [Dirs.LEFT, Dirs.RIGHT, Dirs.UP, Dirs.DOWN];
+    startRow = Math.floor(Math.random() * grid.height);
+    startCol = Math.floor(Math.random() * grid.width);
+    visited = []
+    recursiveExplore(startRow, startCol); //begin exploring cells recursively
+    function recursiveExplore(row, col) {
+        visited.push(`${row},${col}`);     //mark the current cell as visited
+        //randomize the order of directions. this way the maze doesn't just pick the same walls to go through (straight lines otherwise)
+        shuffle(potDirs)
+        for (let dir of potDirs) {
+          [currRow, currCol] = grid.getPos(row, col, dir);
+            //check if new (neighboring) cell is within bounds and not visited
+            if (grid.validPos(currRow, currCol) && !visited.includes(`${currRow},${currCol}`)) {
+                //remove the wall between the current cell and the new cell
+                grid.removeWall(row, col, dir);
+                //recursively explore the new cell
+                recursiveExplore(currRow, currCol);
+            }
+        }
+    }
+    return grid;
+  }
+
+  /**
    * Draws labyrinth on canvas
    */
   drawLabyrinth() {
     const labyrinthPath = Maze.generateLabyrinthPath(this.maze);
-
     let context = this.drawMaze();
     let canvas = document.getElementById("maze-canvas");
     let context2 = canvas.offscreenCanvas2.getContext("2d");
@@ -378,7 +413,7 @@ export default class Maze {
     context2.beginPath();
     context2.globalAlpha = 1;
     context2.fillStyle = this.goalColor;
-    if (this.type === "maze") {
+    if (this.type === "maze"|| this.type === "maze2") {
       context.fillRect(this.maze.width * this.pathSize - this.pathSize * 0.85 + 10, this.maze.height * this.pathSize - this.pathSize * 0.85 + 10, this.pathSize * 0.7, this.pathSize * 0.7);
       context2.fillRect(this.maze.width * this.pathSize - this.pathSize * 0.85 + 10, this.maze.height * this.pathSize - this.pathSize * 0.85 + 10, this.pathSize * 0.7, this.pathSize * 0.7);
     } else {
@@ -401,7 +436,7 @@ export default class Maze {
         if (this.effects === true) {
           if (cell.left) {
             context.moveTo(x, y);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context.bezierCurveTo(x + this.pathSize / 2, y + this.pathSize / 4, x - this.pathSize / 2, y + (3 * this.pathSize) / 4, x, y + this.pathSize);
             } else {
               context.bezierCurveTo(x + this.pathSize / 4, y + this.pathSize / 8, x - this.pathSize / 4, y + (3 * this.pathSize) / 8, x, y + this.pathSize / 2);
@@ -413,7 +448,7 @@ export default class Maze {
           }
           if (cell.right) {
             context.moveTo(x + this.pathSize, y);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context.bezierCurveTo(x + (3 * this.pathSize) / 2, y + this.pathSize / 4, x + this.pathSize / 2, y + (3 * this.pathSize) / 4, x + this.pathSize, y + this.pathSize);
             } else {
               context.bezierCurveTo(x + (5 * this.pathSize) / 4, y + this.pathSize / 8, x + (3 * this.pathSize) / 4, y + (3 * this.pathSize) / 8, x + this.pathSize, y + this.pathSize / 2);
@@ -425,7 +460,7 @@ export default class Maze {
           }
           if (cell.up) {
             context.moveTo(x, y);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context.bezierCurveTo(x + this.pathSize / 4, y - this.pathSize / 2, x + (3 * this.pathSize) / 4, y + this.pathSize / 2, x + this.pathSize, y);
             } else {
               context.bezierCurveTo(x + this.pathSize / 8, y - this.pathSize / 4, x + (3 * this.pathSize) / 8, y + this.pathSize / 4, x + this.pathSize / 2, y);
@@ -437,7 +472,7 @@ export default class Maze {
           }
           if (cell.down) {
             context.moveTo(x, y + this.pathSize);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context.bezierCurveTo(x + this.pathSize / 4, y + this.pathSize - this.pathSize / 2, x + (3 * this.pathSize) / 4, y + this.pathSize + this.pathSize / 2, x + this.pathSize, y + this.pathSize);
             } else {
               context.bezierCurveTo(x + this.pathSize / 8, y + this.pathSize - this.pathSize / 4, x + (3 * this.pathSize) / 8, y + this.pathSize + this.pathSize / 4, x + this.pathSize / 2, y + this.pathSize);
@@ -452,7 +487,7 @@ export default class Maze {
             context.moveTo(x, y);
             context.lineTo(x, y + this.pathSize);
             context2.moveTo(x, y);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context2.bezierCurveTo(x + this.pathSize / 2, y + this.pathSize / 4, x - this.pathSize / 2, y + (3 * this.pathSize) / 4, x, y + this.pathSize);
             } else {
               context2.bezierCurveTo(x + this.pathSize / 4, y + this.pathSize / 8, x - this.pathSize / 4, y + (3 * this.pathSize) / 8, x, y + this.pathSize / 2);
@@ -463,7 +498,7 @@ export default class Maze {
             context.moveTo(x + this.pathSize, y);
             context.lineTo(x + this.pathSize, y + this.pathSize);
             context2.moveTo(x + this.pathSize, y);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context2.bezierCurveTo(x + (3 * this.pathSize) / 2, y + this.pathSize / 4, x + this.pathSize / 2, y + (3 * this.pathSize) / 4, x + this.pathSize, y + this.pathSize);
             } else {
               context2.bezierCurveTo(x + (5 * this.pathSize) / 4, y + this.pathSize / 8, x + (3 * this.pathSize) / 4, y + (3 * this.pathSize) / 8, x + this.pathSize, y + this.pathSize / 2);
@@ -474,7 +509,7 @@ export default class Maze {
             context.moveTo(x, y);
             context.lineTo(x + this.pathSize, y);
             context2.moveTo(x, y);
-            if (this.type === "maze") {
+            if (this.type === "maze"|| this.type === "maze2") {
               context2.bezierCurveTo(x + this.pathSize / 4, y - this.pathSize / 2, x + (3 * this.pathSize) / 4, y + this.pathSize / 2, x + this.pathSize, y);
             } else {
               context2.bezierCurveTo(x + this.pathSize / 8, y - this.pathSize / 4, x + (3 * this.pathSize) / 8, y + this.pathSize / 4, x + this.pathSize / 2, y);
@@ -485,7 +520,7 @@ export default class Maze {
             context.moveTo(x, y + this.pathSize);
             context.lineTo(x + this.pathSize, y + this.pathSize);
             context2.moveTo(x, y + this.pathSize);
-            if (this.type === "maze") {
+            if (this.type === "maze" || this.type === "maze2") {
               context2.bezierCurveTo(x + this.pathSize / 4, y + this.pathSize - this.pathSize / 2, x + (3 * this.pathSize) / 4, y + this.pathSize + this.pathSize / 2, x + this.pathSize, y + this.pathSize);
             } else {
               context2.bezierCurveTo(x + this.pathSize / 8, y + this.pathSize - this.pathSize / 4, x + (3 * this.pathSize) / 8, y + this.pathSize + this.pathSize / 4, x + this.pathSize / 2, y + this.pathSize);
@@ -503,9 +538,9 @@ export default class Maze {
   }
 
   draw() {
-    if (this.type === "maze") {
+    if (this.type === "maze" || this.type == "maze2") {
       this.drawMaze();
-    } else {
+    } else if (this.type === "labyrinth") {
       this.drawLabyrinth();
     }
   }
