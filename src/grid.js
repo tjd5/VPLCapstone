@@ -173,4 +173,6 @@ export default class Grid {
     }
     return potPos;
   }
+
+
 }
