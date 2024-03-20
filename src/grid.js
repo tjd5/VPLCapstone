@@ -174,5 +174,29 @@ export default class Grid {
     return potPos;
   }
 
-
+  /**
+   * Counts the number of dead-ends and branches in the maze
+   * @returns {Object} object containing number of dead-ends and branches
+   */
+  countDeadEndsAndBranches() {
+    let deadEnds=0; let branches=0;
+    //iterate through every cell by row/column
+    for (let row=0; row<this.height; row++) {
+      for (let col=0; col<this.width; col++) {
+        //don't count the entrance/exit as a dead-end since they're added after gen (fixed spots rn)
+        if ((row === 0 && col === 0) || (row === this.height - 1 && col === this.width - 1)) continue;
+        /* "openings" refer to how many non-walls there are. check each dir for a wall.
+         * if there is only 1 opening, it's a dead-end. >2, it's a branch.
+         */
+        let openings=0;
+        if (this.canMove(row, col, Dirs.RIGHT)) openings++;
+        if (this.canMove(row, col, Dirs.LEFT)) openings++;
+        if (this.canMove(row, col, Dirs.UP)) openings++;
+        if (this.canMove(row, col, Dirs.DOWN)) openings++;
+        if (openings === 1) deadEnds++;
+        else if (openings >2) branches++;
+      }
+    }
+    return { deadEnds, branches };
+  }
 }
