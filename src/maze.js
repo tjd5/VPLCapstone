@@ -41,12 +41,13 @@ export default class Maze {
     else if (this.type === "maze") { 
       this.maze = Maze.generateMaze(new Grid(this.height, this.width));
       this.maze.getCell(0, 0).left = false; // creates entrance
-      this.maze.getCell(this.maze.height - 1, this.maze.width - 1).right = false; // creates exit 
+      this.maze.getCell(this.maze.height - 1, this.maze.width - 1).right = false; // creates exit
     }
     else if (this.type === "maze2") { 
       this.maze = Maze.generateMazeRecursiveBacktracker(new Grid(this.height, this.width)); 
       this.maze.getCell(0, 0).left = false; // creates entrance
       this.maze.getCell(this.maze.height - 1, this.maze.width - 1).right = false; // creates exit
+      
     }
     for (let i = 0; i < backgroundRects.num; i++) {
       this.backgroundRects.rectInfo.push({
@@ -56,6 +57,14 @@ export default class Maze {
         height: Math.floor(Math.random() * this.pathSize * this.height),
       });
     }
+    /* DOES NOT WORK FOR LABYRINTH! 
+     * Labyrinth generates a growing tree maze and then trims itself in some weird way.
+     * So it tracks deadends + branches from before the trim. It also doesn't work in general.
+     * Needs to be fixed for solving but visually it's fine.
+     */
+    let { deadEnds, branches } = this.maze.countDeadEndsAndBranches();
+    console.log("Number of dead ends:", deadEnds);
+    console.log("Number of branches:", branches);
   }
 
   /**
@@ -251,6 +260,7 @@ export default class Maze {
             }
         }
     }
+    
     return grid;
   }
 
