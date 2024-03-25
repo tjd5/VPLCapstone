@@ -127,51 +127,52 @@ export function addMaze() {
   }
 
   mazeVals = {
-    design: mazeDesignValue,
-    pathColor: pathColorValue,
-    wallColor: wallColorValue,
-    width: widthValue,
-    height: heightValue,
-    pathSize: pathSizeValue,
-    blur: blurValue,
-    wallSize: wallSizeValue,
-    shadowBlur: shadowBlurValue,
-    shadowColor: shadowColorValue,
-    userIconColor: userIconColorValue,
-    goalColor: goalColorValue,
-    backgroundRects: {
-        num: backgroundRectNumValue,
-        border: backgroundRectBorderValue,
-        fill: backgroundRectFillValue,
-    },
-    effects: effectsValue,
-};
+  design: mazeDesignValue,
+  pathColor: pathColorValue,
+  wallColor: wallColorValue,
+  width: widthValue,
+  height: heightValue,
+  pathSize: pathSizeValue,
+  blur: blurValue,
+  wallSize: wallSizeValue,
+  shadowBlur: shadowBlurValue,
+  shadowColor: shadowColorValue,
+  userIconColor: userIconColorValue,
+  goalColor: goalColorValue,
+  backgroundRects: {
+      num: backgroundRectNumValue,
+      border: backgroundRectBorderValue,
+      fill: backgroundRectFillValue,
+  },
+  effects: effectsValue,
+  };
 
-// Ensure that mazes array is defined before pushing
-if (!Array.isArray(mazes)) {
-    mazes = [];
+  // Ensure that mazes array is defined before pushing
+  if (!Array.isArray(mazes)) {
+      mazes = [];
+  }
+
+  // Push the mazeVals object into the mazes array
+  mazes.push(mazeVals);
+
+  document.querySelector("#start-btn").disabled = false;
+  const table = document.querySelector(".maze-table");
+  const tr = document.createElement("tr");
+  const values = [
+      widthValue,
+      heightValue,
+      pathSizeValue,
+      pathColorValue,
+      wallColorValue,
+  ];
+  for (const value of values) {
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(td);
+  }
+
+  table.appendChild(tr);
 }
 
-// Push the mazeVals object into the mazes array
-mazes.push(mazeVals);
-
-document.querySelector("#start-btn").disabled = false;
-const table = document.querySelector(".maze-table");
-const tr = document.createElement("tr");
-const values = [
-    widthValue,
-    heightValue,
-    pathSizeValue,
-    pathColorValue,
-    wallColorValue,
-];
-for (const value of values) {
-    const td = document.createElement("td");
-    td.textContent = value;
-    tr.appendChild(td);
-}
-
-table.appendChild(tr);
-}
 window.addMaze = addMaze;
 window.clearTrial = clearTrial;

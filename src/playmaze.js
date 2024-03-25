@@ -213,14 +213,6 @@ export function downloadMaze() {
     link.click();
     URL.revokeObjectURL(url);
   });
-  canvas.offscreenCanvas2.toBlob((blob) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a"); // Or maybe get it from the current document
-    link.href = url;
-    link.download = `${mazeVals.width}x${mazeVals.height}-${mazeVals.pathColor}-path-${mazeVals.wallColor}-wall-${mazeVals.design}.png`;
-    link.click();
-    URL.revokeObjectURL(url);
-  });
 }
 
 export function drawUserIcon() {
@@ -278,8 +270,8 @@ export function resetUserIcon() {
   userIcon = {
     width: mazeVals.pathSize * 0.5,
     height: mazeVals.pathSize * 0.5,
-    x: mazeVals.pathSize * 0.125,
-    y: mazeVals.pathSize * 0.125,
+    x: mazeVals.pathSize * 0.5,
+    y: mazeVals.pathSize * 0.75,
     color: mazeVals.userIconColor,
   };
 }
